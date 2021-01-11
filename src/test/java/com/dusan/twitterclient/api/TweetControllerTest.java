@@ -77,6 +77,15 @@ class TweetControllerTest {
             assertThat(actualStatusCode).isEqualTo(expectedStatusCode);
         }
 
+        private MvcResult callPostTweetUrl(String username, PostTweetCommand postTweetCommand) throws Exception {
+            return mvc.perform(post("/api/tweets")
+                    .param("username", username)
+                    .contentType(MediaType.APPLICATION_JSON_VALUE)
+                    .accept(MediaType.APPLICATION_JSON_VALUE)
+                    .content(mapper.writeValueAsString(postTweetCommand)))
+                    .andReturn();
+        }
+
         @Test
         @DisplayName("Return http status - bad request when a request body is not provided")
         void postTweetMissingRequestBody() throws Exception {
@@ -84,20 +93,18 @@ class TweetControllerTest {
             String username = "dusan";
 
             // when
-            MvcResult result = callPostTweetUrl(username, null);
+            MvcResult result = callPostTweetUrlNoBody(username);
 
             // then
             int actualStatusCode = result.getResponse().getStatus();
-            int expectedStatusCode = 400;
+            int expectedStatusCode = 415;
             assertThat(actualStatusCode).isEqualTo(expectedStatusCode);
         }
 
-        private MvcResult callPostTweetUrl(String username, PostTweetCommand postTweetCommand) throws Exception {
+        private MvcResult callPostTweetUrlNoBody(String username) throws Exception {
             return mvc.perform(post("/api/tweets")
                     .param("username", username)
-                    .contentType(MediaType.APPLICATION_JSON_VALUE)
-                    .accept(MediaType.APPLICATION_JSON_VALUE)
-                    .content(mapper.writeValueAsString(postTweetCommand)))
+                    .accept(MediaType.APPLICATION_JSON_VALUE))
                     .andReturn();
         }
     }
